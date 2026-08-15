@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+.dark {
+  --bg1: #0f0a1f;
+  --bg2: #1a1333;
+  --fg: #ece8f5;
+  --chart-bg: #0b1020;
+  --chart-line: #6b7bb0;
+  --chart-grid: #33406b;
+  --chart-text: #e8e8f0;
+  --chart-muted: #8ea0c8;
+  --chart-accent: #ffd479;
+}
+
+.light {
+  --bg1: #f5f3fc;
+  --bg2: #ffffff;
+  --fg: #241a3a;
+  --chart-bg: #ffffff;
+  --chart-line: #9a8cc4;
+  --chart-grid: #d8ccef;
+  --chart-text: #2a1f45;
+  --chart-muted: #6b5a8f;
+  --chart-accent: #b45309;
+}
+
+body {
+  background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%);
+  color: var(--fg);
+  min-height: 100vh;
+}
+
+/* Hide the horizontal scrollbar on the mobile tab strip while keeping it scrollable. */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Light theme: retune the dark-first translucent utilities so panels,
+   borders and popovers read correctly on a light background. */
+html.light .bg-black\/20 { background-color: rgba(30, 18, 60, 0.04); }
+html.light .bg-black\/30 { background-color: rgba(30, 18, 60, 0.05); }
+html.light .border-white\/5 { border-color: rgba(30, 18, 60, 0.08); }
+html.light .border-white\/10 { border-color: rgba(30, 18, 60, 0.12); }
+html.light .border-white\/15 { border-color: rgba(30, 18, 60, 0.18); }
+html.light .border-white\/20 { border-color: rgba(30, 18, 60, 0.25); }
+html.light .bg-cosmic\/70 { background-color: rgba(245, 243, 252, 0.85); }
+html.light .bg-cosmic { background-color: #ffffff; }
+html.light .hover\:bg-white\/10:hover { background-color: rgba(30, 18, 60, 0.07); }
+html.light .hover\:bg-white\/20:hover { background-color: rgba(30, 18, 60, 0.12); }
+/* Header inherits the theme foreground colour instead of a fixed light one. */
+html.light header.site-header { color: var(--fg); }
+
+/* Print / PDF export layout. */
+.print-only { display: none; }
+
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block; }
+  body { background: #ffffff; color: #000000; }
+  /* Force a light, ink-friendly chart palette for PDF output. */
+  :root {
+    --chart-bg: #ffffff;
+    --chart-line: #555;
+    --chart-grid: #bbb;
+    --chart-text: #111;
+    --chart-muted: #444;
+    --chart-accent: #b45309;
+  }
+  .page-break { break-before: page; page-break-before: always; }
+  .print-only,
+  .print-only * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print-only .text-accent { color: #6d28d9; }
+  .print-only .border-white\/10,
+  .print-only .border-white\/20 { border-color: rgba(0, 0, 0, 0.25); }
+
+  /* Give every PDF page a comfortable margin. */
+  @page { margin: 13mm; }
+
+  /* Dasa page: extra breathing room and print-friendly card colours. */
+  .dasa-page { padding: 2mm 1mm; }
+  .dasa-card { break-inside: avoid; border-color: rgba(0, 0, 0, 0.18) !important; background: #faf7fe !important; }
+  .dasa-card-head { background: #efe6fb !important; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+
+  /* Divisional page: shrink the five charts so they all fit on one page. */
+  .varga-grid { gap: 2mm 5mm; }
+  .varga-cell { break-inside: avoid; }
+  .varga-cell svg { max-width: 15rem; }
+
+}

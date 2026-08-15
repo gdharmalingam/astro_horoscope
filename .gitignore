@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+
+# Env & secrets
+.env
+.env.local
+.env.*
+!.env.example
+!.env.production.example
+*.local
+firebase-service-account*.json
+supabase/.temp/
+
+# Swiss Ephemeris data files (large binaries; download separately)
+backend/ephe/*.se1
+
+# OS / editor
+.DS_Store
+Thumbs.db
