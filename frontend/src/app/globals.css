@@ -68,7 +68,9 @@ html.light header.site-header { color: var(--fg); }
     --chart-muted: #444;
     --chart-accent: #b45309;
   }
+  @page { size: A4 portrait; margin: 12mm; }
   .page-break { break-before: page; page-break-before: always; }
+  .print-page { box-sizing: border-box; min-height: 273mm; padding: 2mm 1mm; }
   .print-only,
   .print-only * {
     -webkit-print-color-adjust: exact;
@@ -78,17 +80,23 @@ html.light header.site-header { color: var(--fg); }
   .print-only .border-white\/10,
   .print-only .border-white\/20 { border-color: rgba(0, 0, 0, 0.25); }
 
-  /* Give every PDF page a comfortable margin. */
-  @page { margin: 13mm; }
-
-  /* Dasa page: extra breathing room and print-friendly card colours. */
-  .dasa-page { padding: 2mm 1mm; }
+  /* Dasa page: print-friendly card colours. */
   .dasa-card { break-inside: avoid; border-color: rgba(0, 0, 0, 0.18) !important; background: #faf7fe !important; }
   .dasa-card-head { background: #efe6fb !important; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
 
   /* Divisional page: shrink the five charts so they all fit on one page. */
+  .print-chart-grid { gap: 5mm; }
+  .print-chart-grid svg { max-width: 100%; }
   .varga-grid { gap: 2mm 5mm; }
   .varga-cell { break-inside: avoid; }
   .varga-cell svg { max-width: 15rem; }
+
+  @media (max-width: 600px) {
+    .print-page { min-height: 0; padding: 0; }
+    .print-chart-grid { gap: 3mm; }
+    .print-chart-grid svg { max-width: 9.5rem; }
+    .varga-grid { gap: 2mm; }
+    .varga-cell svg { max-width: 8.5rem; }
+  }
 
 }

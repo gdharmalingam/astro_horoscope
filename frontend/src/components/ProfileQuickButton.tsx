@@ -40,7 +40,17 @@ export function ProfileQuickButton({ current, onLoad }: Props) {
   useEffect(() => {
     if (!user || !open) return;
     setMsg("");
-    api.listProfiles().then(setProfiles).catch(() => setProfiles([]));
+    api
+      .listProfiles()
+      .then(setProfiles)
+      .catch((error) => {
+        setProfiles([]);
+        setMsg(
+          error instanceof Error
+            ? error.message.replace(/^Error:\s*\d+:\s*/, "")
+            : "Unable to load saved profiles."
+        );
+      });
   }, [user, open]);
 
   useEffect(() => {
@@ -71,6 +81,7 @@ export function ProfileQuickButton({ current, onLoad }: Props) {
         place_name: current.location.place_name || null,
       });
       setProfiles((prev) => [...prev, created]);
+      setMsg("Profile saved.");
     } catch (err) {
       setMsg(String(err).replace(/^Error:\s*\d+:\s*/, ""));
     }

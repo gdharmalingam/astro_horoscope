@@ -38,14 +38,25 @@ export function ProfilesTab() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [entry, setEntry] = useState<BirthValue>({ ...emptyEntry });
   const [msg, setMsg] = useState("");
+  const [loadError, setLoadError] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!user) {
       setProfiles([]);
+      setLoadError("");
       return;
     }
-    api.listProfiles().then(setProfiles).catch(() => setProfiles([]));
+    api
+      .listProfiles()
+      .then((items) => {
+        setProfiles(items);
+        setLoadError("");
+      })
+      .catch((error) => {
+        setProfiles([]);
+        setLoadError(error instanceof Error ? error.message.replace(/^Error:\s*\d+:\s*/, "") : "Unable to load saved profiles.");
+      });
   }, [user]);
 
   const full = profiles.length >= 5;
@@ -77,6 +88,7 @@ export function ProfilesTab() {
       });
       setProfiles((prev) => [...prev, created]);
       setEntry({ ...emptyEntry, location: { ...emptyLocation } });
+      setMsg("Profile saved.");
     } catch (err) {
       setMsg(String(err).replace(/^Error:\s*\d+:\s*/, ""));
     } finally {
@@ -147,6 +159,7 @@ export function ProfilesTab() {
             ))}
           </ul>
         )}
+        {loadError && <p className="text-sm text-red-400">{loadError}</p>}
       </section>
 
       <section className="bg-black/20 p-4 sm:p-5 rounded-xl space-y-4">

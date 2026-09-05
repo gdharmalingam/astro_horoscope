@@ -1,3 +1,17 @@
+# Settings for the Next.js frontend served by Firebase App Hosting.
 runConfig:
   minInstances: 0
-  maxInstances: 3
+
+env:
+  - variable: NEXT_PUBLIC_API_BASE_URL
+    value: https://horo-cloud-backend-812834065830.asia-southeast1.run.app/api/v1
+    availability:
+      - BUILD
+  - variable: NEXT_PUBLIC_SUPABASE_URL
+    value: https://ezrhtkqpqjtbyrmztnhi.supabase.co
+    availability:
+      - BUILD
+  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
+    value: sb_publishable__GWp2ojWGnMn1_LH2nGlvQ_6a3_QAz5
+    availability:
+      - BUILD

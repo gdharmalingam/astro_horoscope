@@ -27,12 +27,21 @@ function displayToIso(s: string): string | null {
   return `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
 
+function formatDateInput(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
 export function DateField({ value, onChange }: Props) {
   const [text, setText] = useState(isoToDisplay(value));
   const [open, setOpen] = useState(false);
   const base = value ? new Date(value) : new Date();
   const [viewY, setViewY] = useState(base.getFullYear());
   const [viewM, setViewM] = useState(base.getMonth());
+  const [yearPickerOpen, setYearPickerOpen] = useState(false);
+  const [yearStart, setYearStart] = useState(Math.max(1900, Math.floor(base.getFullYear() / 12) * 12));
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,6 +50,7 @@ export function DateField({ value, onChange }: Props) {
       const dt = new Date(value);
       setViewY(dt.getFullYear());
       setViewM(dt.getMonth());
+      setYearStart(Math.max(1900, Math.floor(dt.getFullYear() / 12) * 12));
     }
   }, [value]);
 
@@ -52,9 +62,14 @@ export function DateField({ value, onChange }: Props) {
     return () => document.removeEventListener("mousedown", h);
   }, []);
 
-  function commitText(s: string) {
-    setText(s);
-    const iso = displayToIso(s);
+  function commitText(raw: string) {
+    const formatted = formatDateInput(raw);
+    setText(formatted);
+    if (!formatted) {
+      onChange("");
+      return;
+    }
+    const iso = displayToIso(formatted);
     if (iso) {
       onChange(iso);
       const dt = new Date(iso);
@@ -123,17 +138,53 @@ export function DateField({ value, onChange }: Props) {
                   </option>
                 ))}
               </select>
-              <input
-                type="number"
-                value={viewY}
-                onChange={(e) => setViewY(+e.target.value)}
-                className="w-16 bg-black/30 border border-white/10 rounded px-1"
-              />
+              <button
+                type="button"
+                onClick={() => setYearPickerOpen((current) => !current)}
+                className="w-20 bg-black/30 border border-white/10 rounded px-1 py-0.5 hover:bg-white/10"
+              >
+                {viewY}
+              </button>
             </div>
             <button type="button" onClick={() => shiftMonth(1)} className="px-2">
               ›
             </button>
           </div>
+
+          {yearPickerOpen ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <button
+                  type="button"
+                  onClick={() => setYearStart((year) => Math.max(1900, year - 12))}
+                  disabled={yearStart === 1900}
+                  className="px-2 disabled:opacity-30"
+                >
+                  ‹
+                </button>
+                <span>{yearStart}-{yearStart + 11}</span>
+                <button type="button" onClick={() => setYearStart((year) => year + 12)} className="px-2">
+                  ›
+                </button>
+              </div>
+              <div className="grid grid-cols-4 gap-1 text-center text-sm">
+                {Array.from({ length: 12 }, (_, index) => yearStart + index).map((year) => (
+                  <button
+                    key={year}
+                    type="button"
+                    onClick={() => {
+                      setViewY(year);
+                      setYearPickerOpen(false);
+                    }}
+                    className={`rounded py-2 hover:bg-white/10 ${year === viewY ? "bg-accent text-cosmic font-semibold" : ""}`}
+                  >
+                    {year}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
 
           <div className="grid grid-cols-7 gap-1 text-center text-xs opacity-60 mb-1">
             {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
@@ -162,6 +213,8 @@ export function DateField({ value, onChange }: Props) {
               )
             )}
           </div>
+            </>
+          )}
         </div>
       )}
     </div>

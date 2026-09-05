@@ -12,6 +12,11 @@ node_modules/
 out/
 npm-debug.log*
 
+# Firebase-injected agent skill files (not part of the app)
+frontend/.agents/
+frontend/.claude/
+frontend/skills-lock.json
+
 # Env & secrets
 .env
 .env.local

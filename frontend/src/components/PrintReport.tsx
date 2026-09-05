@@ -30,6 +30,7 @@ export function PrintReport({ chart, name, sex, place, style = "north" }: Props)
 
   return (
     <div className="print-only text-black">
+      <div className="print-page">
       <div className="text-center mb-4">
         <h1 className="text-2xl font-bold">{name || "Horoscope"}</h1>
         <p className="text-sm capitalize">
@@ -41,7 +42,7 @@ export function PrintReport({ chart, name, sex, place, style = "north" }: Props)
       </div>
 
       {/* Page 1: D-1 and D-9 adjacent, then planetary positions. */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="print-chart-grid grid grid-cols-2 gap-6">
         <div>
           <h3 className="font-semibold mb-1 text-center">D-1 Rasi</h3>
           <ChartDiagram
@@ -49,7 +50,7 @@ export function PrintReport({ chart, name, sex, place, style = "north" }: Props)
             ascendant={chart.ascendant}
             houses={chart.houses}
             hideControls
-            initialStyle={style}
+            style={style}
             personName={name}
             vargaLabel="D-1 Rasi"
           />
@@ -62,7 +63,7 @@ export function PrintReport({ chart, name, sex, place, style = "north" }: Props)
               ascendant={div.D9.ascendant}
               houses={div.D9.houses}
               hideControls
-              initialStyle={style}
+              style={style}
               personName={name}
               vargaLabel="D-9 Navamsa"
             />
@@ -72,15 +73,16 @@ export function PrintReport({ chart, name, sex, place, style = "north" }: Props)
 
       <h3 className="font-semibold mt-5 mb-2">Planetary Positions</h3>
       <PlanetTable planets={chart.planets} ascendant={chart.ascendant} />
+      </div>
 
       {/* Page 2: Vimshottari dasa. */}
-      <div className="page-break dasa-page">
+      <div className="page-break print-page dasa-page">
         <h3 className="font-semibold mb-3">Vimshottari Dasa</h3>
         <DasaTable mahadashas={chart.dasa.mahadashas} />
       </div>
 
       {/* Page 3: remaining divisional charts (all five fit on one page). */}
-      <div className="page-break varga-page">
+      <div className="page-break print-page varga-page">
         <h3 className="font-semibold mb-3">Divisional Charts</h3>
         <div className="varga-grid grid grid-cols-2 gap-x-6 gap-y-3">
           {REST.map(([code, label]) =>
@@ -92,7 +94,7 @@ export function PrintReport({ chart, name, sex, place, style = "north" }: Props)
                   ascendant={div[code].ascendant}
                   houses={div[code].houses}
                   hideControls
-                  initialStyle={style}
+                  style={style}
                   personName={name}
                   vargaLabel={label}
                 />

@@ -1,0 +1,12 @@
+# Keep Cloud Build uploads small and predictable for `gcloud run deploy --source`.
+# Config (DATABASE_URL, SUPABASE_URL, CORS_ORIGINS) is supplied via Cloud Run
+# env vars / Secret Manager, so .env is intentionally NOT baked into the image.
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+.env.*
+!.env.example
+tests/

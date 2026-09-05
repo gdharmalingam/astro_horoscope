@@ -123,7 +123,7 @@ function StackedTokens({
             {tk.abbr}
             {tk.retro && (
               <tspan fontSize={9} fill="var(--chart-accent)">
-                {" (*)"}
+                *
               </tspan>
             )}
             {tk.suffix}

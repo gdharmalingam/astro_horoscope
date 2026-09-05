@@ -50,6 +50,15 @@ function parseTime(s: string): string | null {
   return null;
 }
 
+function formatTimeInput(value: string): string {
+  const suffixMatch = value.match(/([ap])m?$/i);
+  const suffix = suffixMatch ? ` ${suffixMatch[0].toUpperCase()}` : "";
+  const timePart = suffixMatch ? value.slice(0, suffixMatch.index) : value;
+  const digits = timePart.replace(/\D/g, "").slice(0, 4);
+  if (digits.length <= 2) return `${digits}${suffix}`;
+  return `${digits.slice(0, 2)}:${digits.slice(2)}${suffix}`;
+}
+
 const R = 84;
 const C = 110;
 
@@ -101,9 +110,13 @@ export function ClockTimePicker({ value, onChange }: Props) {
         <input
           value={text}
           onChange={(e) => {
-            const s = e.target.value;
-            setText(s);
-            const v = parseTime(s);
+            const formatted = formatTimeInput(e.target.value);
+            setText(formatted);
+            if (!formatted) {
+              onChange("");
+              return;
+            }
+            const v = parseTime(formatted);
             if (v) onChange(v);
           }}
           placeholder="hh:mm am/pm"
@@ -124,29 +137,48 @@ export function ClockTimePicker({ value, onChange }: Props) {
 
       {open && (
         <div className="absolute z-[1000] mt-2 p-4 rounded-xl bg-cosmic border border-white/15 shadow-2xl">
-          <div className="flex items-center justify-center gap-2 mb-2 text-lg font-semibold">
-            <button
-              onClick={() => setMode("h")}
-              className={mode === "h" ? "text-accent" : "opacity-60"}
-            >
-              {String(h12).padStart(2, "0")}
-            </button>
-            <span>:</span>
-            <button
-              onClick={() => setMode("m")}
-              className={mode === "m" ? "text-accent" : "opacity-60"}
-            >
-              {String(min).padStart(2, "0")}
-            </button>
-            <div className="ml-3 flex flex-col text-xs">
+          <div className="flex items-center justify-center gap-1 mb-3 text-sm font-semibold">
+            <input
+              type="number"
+              min={1}
+              max={12}
+              value={h12}
+              aria-label="Hour"
+              onFocus={() => setMode("h")}
+              onChange={(e) => {
+                const hour = Number(e.target.value);
+                if (!Number.isInteger(hour) || hour < 1 || hour > 12) return;
+                setH12(hour);
+                commit(hour, min, ampm);
+              }}
+              className={`h-8 w-8 rounded border bg-black/30 p-0 text-center text-sm ${mode === "h" ? "border-accent text-accent" : "border-white/10"}`}
+            />
+            <span className="w-2 text-center">:</span>
+            <input
+              type="number"
+              min={0}
+              max={59}
+              value={String(min).padStart(2, "0")}
+              aria-label="Minute"
+              onFocus={() => setMode("m")}
+              onChange={(e) => {
+                const minute = Number(e.target.value);
+                if (!Number.isInteger(minute) || minute < 0 || minute > 59) return;
+                setMin(minute);
+                commit(h12, minute, ampm);
+              }}
+              className={`h-8 w-8 rounded border bg-black/30 p-0 text-center text-sm ${mode === "m" ? "border-accent text-accent" : "border-white/10"}`}
+            />
+            <div className="ml-1 inline-flex h-8 overflow-hidden rounded border border-white/15 text-xs">
               {(["AM", "PM"] as const).map((a) => (
                 <button
+                  type="button"
                   key={a}
                   onClick={() => {
                     setAmpm(a);
                     commit(h12, min, a);
                   }}
-                  className={`px-2 rounded ${
+                  className={`w-8 p-0 ${
                     ampm === a ? "bg-accent text-cosmic" : "opacity-60"
                   }`}
                 >
@@ -204,52 +236,10 @@ export function ClockTimePicker({ value, onChange }: Props) {
             })}
           </div>
 
-          <div className="flex items-center justify-center gap-2 mt-3 text-sm">
-            <span className="opacity-70">Minute</span>
-            <button
-              type="button"
-              onClick={() => {
-                const m = (min + 59) % 60;
-                setMin(m);
-                setMode("m");
-                commit(h12, m, ampm);
-              }}
-              className="w-7 h-7 rounded bg-black/30 border border-white/15"
-            >
-              −
-            </button>
-            <input
-              type="number"
-              min={0}
-              max={59}
-              value={min}
-              onChange={(e) => {
-                let m = parseInt(e.target.value, 10);
-                if (isNaN(m)) m = 0;
-                m = Math.max(0, Math.min(59, m));
-                setMin(m);
-                commit(h12, m, ampm);
-              }}
-              className="w-14 text-center px-2 py-1 rounded bg-black/30 border border-white/10"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                const m = (min + 1) % 60;
-                setMin(m);
-                setMode("m");
-                commit(h12, m, ampm);
-              }}
-              className="w-7 h-7 rounded bg-black/30 border border-white/15"
-            >
-              +
-            </button>
-          </div>
-
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="mt-2 w-full px-3 py-1.5 rounded-lg bg-accent text-cosmic text-sm font-semibold"
+            className="mt-3 w-full px-3 py-1.5 rounded-lg bg-accent text-cosmic text-sm font-semibold"
           >
             Done
           </button>
